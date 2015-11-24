@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
+
 /**
  * ShekelItem model
  * Created by John on 11/13/2015.
@@ -16,7 +18,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor(suppressConstructorProperties = true)
-public class ShekelItem {
+public class ShekelItem implements ShekelNamed {
     private String name;
     private Integer id;
     private Integer cost;

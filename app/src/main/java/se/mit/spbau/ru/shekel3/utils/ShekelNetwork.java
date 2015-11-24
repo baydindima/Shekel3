@@ -11,7 +11,7 @@ import com.android.volley.toolbox.Volley;
  */
 public class ShekelNetwork  {
     private static final String IP = "46.101.144.60";
-    private static final String SERVER_ADDRESS = "http://" + IP + ":8000/";
+    private static final String SERVER_ADDRESS = "http://" + IP + "/";
     public static final String ITEMS_API_ADDRESS = SERVER_ADDRESS + "items/";
     public static final String USERS_API_ADDRESS = SERVER_ADDRESS + "users/";
 
@@ -40,6 +40,31 @@ public class ShekelNetwork  {
         ShekelNetwork.context = context;
         requestQueue = getRequestQueue();
     }
+
+    public String getAllItemsUrl(Integer receiptId) {
+        return  SERVER_ADDRESS  + "event_id/" + receiptId + "/items";
+    }
+
+    public String getItemUrl(Integer receiptId, Integer itemId) {
+        return SERVER_ADDRESS + "event_id/" + receiptId + "/" + itemId;
+    }
+
+    public String getAllReceiptsUrl() {
+        return SERVER_ADDRESS + "event_id/" + "receipts";
+    }
+
+    public String getReceiptUrl(Integer receiptId) {
+        return SERVER_ADDRESS + "event_id/" + receiptId;
+    }
+
+    public String getAllUsersUrl() {
+        return SERVER_ADDRESS + "users";
+    }
+
+    public  String getUserUrl(Integer userId) {
+        return SERVER_ADDRESS + "users/" + userId;
+    }
+
 
     public <T> void addToRequestQueue(Request<T> request) {
         getRequestQueue().add(request);

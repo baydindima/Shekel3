@@ -23,27 +23,20 @@ import se.mit.spbau.ru.shekel3.MainActivity;
 import se.mit.spbau.ru.shekel3.R;
 import se.mit.spbau.ru.shekel3.adapter.ListShekelItemAdapter;
 import se.mit.spbau.ru.shekel3.model.ShekelItem;
+import se.mit.spbau.ru.shekel3.model.ShekelNamed;
 import se.mit.spbau.ru.shekel3.utils.ShekelNetwork;
 
 
 public class ShekelItemFragment extends ListFragment {
-    private List<ShekelItem> itemList = new ArrayList<>();
+    private List<ShekelNamed> itemList = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        ShekelItem item1 = new ShekelItem("Item1", 1, 10, null, null);
-//        itemList.add(item1);
-//        ShekelItem item2 = new ShekelItem("Item2", 2, 10, null, null);
-//        itemList.add(item2);
-//        ShekelItem item3 = new ShekelItem("Item3", 3, 10, null, null);
-//        itemList.add(item3);
-//        setListAdapter(new ListShekelItemAdapter(getActivity(), itemList));
-
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.GET,
-                ShekelNetwork.ITEMS_API_ADDRESS,
+                ShekelNetwork.getInstance(getContext()).getAllItemsUrl(1),
                 null, // no parameters post
                 new Response.Listener<JSONObject>() {
                     @Override
