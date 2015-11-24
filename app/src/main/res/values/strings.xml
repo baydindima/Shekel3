@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Shekel3</string>
+    <string name="action_settings">Settings</string>
+    <string name="addString">Добавить</string>
+    <string name="costString">Цена</string>
+    <string name="nameString">Название</string>
+    <string name="addItemString">Добавить вещь</string>
+</resources>
