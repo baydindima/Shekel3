@@ -21,10 +21,6 @@ public class CheckBoxListShekelNamedAdapter extends ArrayAdapter<ShekelBaseEntit
 
     private Set<Integer> selected = new HashSet<>();
 
-    public Set<Integer> getSelected() {
-        return selected;
-    }
-
     public CheckBoxListShekelNamedAdapter(Context context, List<ShekelBaseEntity> items1) {
         super(context, R.layout.check_list, items1);
     }
@@ -34,8 +30,8 @@ public class CheckBoxListShekelNamedAdapter extends ArrayAdapter<ShekelBaseEntit
         selected = selectedItems;
     }
 
-    private static class ViewHolder {
-        CheckBox name;
+    public Set<Integer> getSelected() {
+        return selected;
     }
 
     @Override
@@ -73,6 +69,10 @@ public class CheckBoxListShekelNamedAdapter extends ArrayAdapter<ShekelBaseEntit
         viewHolder.name.setTag(item);
         // Return the completed view to render on screen
         return convertView;
+    }
+
+    private static class ViewHolder {
+        CheckBox name;
     }
 }
 

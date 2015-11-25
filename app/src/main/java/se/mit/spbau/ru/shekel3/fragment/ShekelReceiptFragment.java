@@ -1,6 +1,5 @@
 package se.mit.spbau.ru.shekel3.fragment;
 
-
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -27,55 +26,50 @@ import se.mit.spbau.ru.shekel3.MainActivity;
 import se.mit.spbau.ru.shekel3.R;
 import se.mit.spbau.ru.shekel3.adapter.ListShekelNamedAdapter;
 import se.mit.spbau.ru.shekel3.model.ShekelBaseEntity;
-import se.mit.spbau.ru.shekel3.model.ShekelItem;
 import se.mit.spbau.ru.shekel3.model.ShekelReceipt;
 import se.mit.spbau.ru.shekel3.model.ShekelUser;
 import se.mit.spbau.ru.shekel3.utils.ShekelNetwork;
 
-
-public class ShekelItemFragment extends ListFragment {
+public class ShekelReceiptFragment extends ListFragment {
     private MainActivity mainActivity;
-    private List<ShekelBaseEntity> itemList = new ArrayList<>();
+    private List<ShekelBaseEntity> receiptList = new ArrayList<>();
     private Map<Integer, ShekelUser> users;
-    private ShekelReceipt receipt;
-
-    public void setReceipt(ShekelReceipt shekelReceipt) {
-        receipt = shekelReceipt;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainActivity = (MainActivity) getActivity();
+
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.GET,
-                ShekelNetwork.getInstance(getContext()).getAllItemsUrl(receipt.getId()),
+                ShekelNetwork.getInstance(getContext()).getAllReceiptsUrl(),
                 null, // no parameters post
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         Gson gson = new Gson();
                         users = mainActivity.getUsers(); //todo maybe error (race)
-                        ShekelItem.ItemModelContainer container = gson.fromJson(response.toString(), ShekelItem.ItemModelContainer.class);
-                        List<ShekelItem.ItemModel> data = container.getData();
-                        for (ShekelItem.ItemModel itemModel : data) {
-                            ShekelItem shekelItem = new ShekelItem();
-                            shekelItem.setCost(itemModel.getCost());
-                            shekelItem.setId(itemModel.getId());
-                            shekelItem.setName(itemModel.getName());
-                            for (Integer id : itemModel.getConsumer_ids()) {
-                                shekelItem.getConsumers().add(users.get(id));
+                        ShekelReceipt.ShekelReceiptModelContainer container = gson.fromJson(response.toString(), ShekelReceipt.ShekelReceiptModelContainer.class);
+                        for (ShekelReceipt.ShekelReceiptModel shekelReceiptModel : container.getData()) {
+                            ShekelReceipt shekelReceipt = new ShekelReceipt();
+                            shekelReceipt.setId(shekelReceiptModel.getId());
+                            shekelReceipt.setName(shekelReceiptModel.getName());
+                            shekelReceipt.setCost(shekelReceiptModel.getCost());
+                            shekelReceipt.setOwner(users.get(shekelReceiptModel.getOwner()));
+                            List<ShekelUser> userList = new ArrayList<>();
+                            for (Integer userId : shekelReceiptModel.getConsumer_ids()) {
+                                userList.add(users.get(userId));
                             }
-                            shekelItem.setCustomer(users.get(itemModel.getCustomer()));
-                            itemList.add(shekelItem);
+                            shekelReceipt.setConsumers(userList);
+                            receiptList.add(shekelReceipt);
                         }
-                        setListAdapter(new ListShekelNamedAdapter(getActivity(), itemList));
+                        setListAdapter(new ListShekelNamedAdapter(getActivity(), receiptList));
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("Item Fragment", "onErrorResponse() called with: " + "error = [" + error + "]");
+                        Log.d("Receipt Fragment", "onErrorResponse() called with: " + "error = [" + error + "]");
                     }
                 }
         );
@@ -101,34 +95,34 @@ public class ShekelItemFragment extends ListFragment {
     public boolean onContextItemSelected(MenuItem item) {
         if (getUserVisibleHint()) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-            ShekelItem shekelItem = (ShekelItem) getListAdapter().getItem(info.position);
+            ShekelReceipt receipt = (ShekelReceipt) getListAdapter().getItem(info.position);
             switch (item.getItemId()) {
                 case R.id.action_add:
-                    mainActivity.addNewItem(receipt);
+                    mainActivity.addNewReceipt();
                     return true;
                 case R.id.action_delete:
                     JsonObjectRequest request = new JsonObjectRequest(
                             Request.Method.GET,
-                            ShekelNetwork.getInstance(getContext()).getUrlForDeleteItem(receipt.getId(), shekelItem),
+                            ShekelNetwork.getInstance(getContext()).getUrlForDeleteReceipt(receipt),
                             null, // no parameters post
                             new Response.Listener<JSONObject>() {
                                 @Override
                                 public void onResponse(JSONObject response) {
-                                    Log.d("Item Fragment", "onErrorResponse() called with: " + "error = [" + response + "]");
+                                    Log.d("Receipt Fragment", "onErrorResponse() called with: " + "error = [" + response + "]");
                                 }
                             },
                             new Response.ErrorListener() {
                                 @Override
                                 public void onErrorResponse(VolleyError error) {
-                                    Log.d("Item Fragment", "onErrorResponse() called with: " + "error = [" + error + "]");
+                                    Log.d("Receipt Fragment", "onErrorResponse() called with: " + "error = [" + error + "]");
                                 }
                             }
                     );
                     ShekelNetwork.getInstance(getContext()).addToRequestQueue(request);
-                    mainActivity.showItemList(receipt);
+                    mainActivity.showReceiptList();
                     return true;
                 case R.id.action_edit:
-                    mainActivity.changeItem(receipt, shekelItem);
+                    mainActivity.changeReceipt(receipt);
                     return true;
                 default:
                     return super.onContextItemSelected(item);
@@ -140,7 +134,7 @@ public class ShekelItemFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        mainActivity.changeItem(receipt, (ShekelItem) l.getAdapter().getItem(position));
+        mainActivity.showItemList((ShekelReceipt) l.getAdapter().getItem(position));
     }
 
 }

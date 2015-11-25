@@ -16,10 +16,6 @@ import se.mit.spbau.ru.shekel3.model.ShekelBaseEntity;
  */
 public class ListShekelNamedAdapter extends ArrayAdapter<ShekelBaseEntity> {
 
-    private static class ViewHolder {
-        TextView name;
-    }
-
     public ListShekelNamedAdapter(Context context, List<ShekelBaseEntity> items1) {
         super(context, android.R.layout.simple_list_item_1, items1);
     }
@@ -43,5 +39,9 @@ public class ListShekelNamedAdapter extends ArrayAdapter<ShekelBaseEntity> {
         viewHolder.name.setText(item.getName());
         // Return the completed view to render on screen
         return convertView;
+    }
+
+    private static class ViewHolder {
+        TextView name;
     }
 }

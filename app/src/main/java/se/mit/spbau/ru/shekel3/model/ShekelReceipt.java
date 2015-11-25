@@ -11,7 +11,8 @@ import lombok.Setter;
  * Created by John on 11/24/2015.
  */
 
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor(suppressConstructorProperties = true)
 public class ShekelReceipt implements ShekelBaseEntity {
@@ -20,15 +21,16 @@ public class ShekelReceipt implements ShekelBaseEntity {
     private Integer cost;
     private ShekelUser owner;
     private List<ShekelItem> items;
-    private List<ShekelUser> consumerIds;
+    private List<ShekelUser> consumers;
 
     /**
      * JSON model
      */
-    @Getter @Setter
+    @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor(suppressConstructorProperties = true)
-    private static class ShekelReceiptModel {
+    public static class ShekelReceiptModel {
         private Integer id;
         private String name;
         private Integer cost;
@@ -37,10 +39,11 @@ public class ShekelReceipt implements ShekelBaseEntity {
         private List<Integer> consumer_ids;
     }
 
-    @Getter @Setter
+    @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor(suppressConstructorProperties = true)
-    private static class ShekelReceiptModelContainer {
+    public static class ShekelReceiptModelContainer {
         private List<ShekelReceiptModel> data;
         private Integer result;
     }

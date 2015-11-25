@@ -20,7 +20,10 @@ import java.util.Map;
 
 import se.mit.spbau.ru.shekel3.fragment.ShekelItemEditFragment;
 import se.mit.spbau.ru.shekel3.fragment.ShekelItemFragment;
+import se.mit.spbau.ru.shekel3.fragment.ShekelReceiptEditFragment;
+import se.mit.spbau.ru.shekel3.fragment.ShekelReceiptFragment;
 import se.mit.spbau.ru.shekel3.model.ShekelItem;
+import se.mit.spbau.ru.shekel3.model.ShekelReceipt;
 import se.mit.spbau.ru.shekel3.model.ShekelUser;
 import se.mit.spbau.ru.shekel3.utils.ShekelNetwork;
 
@@ -67,11 +70,18 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ShekelItemFragment itemFragment = new ShekelItemFragment();
+        ShekelReceiptFragment receiptFragment = new ShekelReceiptFragment();
 
-        itemFragment.setArguments(getIntent().getExtras());
+        receiptFragment.setArguments(getIntent().getExtras());
+
         getSupportFragmentManager().beginTransaction()
-                .add(R.id.fragment, itemFragment).commit();
+                .add(R.id.fragment, receiptFragment).commit();
+
+//        ShekelItemFragment itemFragment = new ShekelItemFragment();
+//
+//        itemFragment.setArguments(getIntent().getExtras());
+//        getSupportFragmentManager().beginTransaction()
+//                .add(R.id.fragment, itemFragment).commit();
     }
 
     @Override
@@ -96,20 +106,57 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void changeItem(ShekelItem item) {
+    public void changeItem(ShekelReceipt receipt, ShekelItem item) {
         ShekelItemEditFragment itemFragment = new ShekelItemEditFragment();
         itemFragment.setShekelItem(item);
 
         itemFragment.setArguments(getIntent().getExtras());
+        itemFragment.setReceipt(receipt);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment, itemFragment).commit();
     }
 
-    public void showList() {
+    public void addNewItem(ShekelReceipt receipt) {
+        ShekelItemEditFragment itemFragment = new ShekelItemEditFragment();
+        itemFragment.setShekelItem(new ShekelItem());
+        itemFragment.setIsNew(true);
+        itemFragment.setArguments(getIntent().getExtras());
+        itemFragment.setReceipt(receipt);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment, itemFragment).commit();
+    }
+
+    public void showItemList(ShekelReceipt receipt) {
         ShekelItemFragment itemFragment = new ShekelItemFragment();
 
         itemFragment.setArguments(getIntent().getExtras());
+        itemFragment.setReceipt(receipt);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment, itemFragment).commit();
+    }
+
+    public void showReceiptList() {
+        ShekelReceiptFragment receiptFragment = new ShekelReceiptFragment();
+        receiptFragment.setArguments(getIntent().getExtras());
+
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment, receiptFragment).commit();
+    }
+
+    public void changeReceipt(ShekelReceipt receipt) {
+        ShekelReceiptEditFragment receiptEditFragment = new ShekelReceiptEditFragment();
+        receiptEditFragment.setReceipt(receipt);
+        receiptEditFragment.setArguments(getIntent().getExtras());
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment, receiptEditFragment).commit();
+    }
+
+    public void addNewReceipt() {
+        ShekelReceiptEditFragment receiptEditFragment = new ShekelReceiptEditFragment();
+        receiptEditFragment.setIsNew(true);
+        receiptEditFragment.setReceipt(new ShekelReceipt());
+        receiptEditFragment.setArguments(getIntent().getExtras());
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment, receiptEditFragment).commit();
     }
 }

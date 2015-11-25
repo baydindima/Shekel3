@@ -30,31 +30,27 @@ import se.mit.spbau.ru.shekel3.MainActivity;
 import se.mit.spbau.ru.shekel3.R;
 import se.mit.spbau.ru.shekel3.adapter.CheckBoxListShekelNamedAdapter;
 import se.mit.spbau.ru.shekel3.model.ShekelBaseEntity;
-import se.mit.spbau.ru.shekel3.model.ShekelItem;
 import se.mit.spbau.ru.shekel3.model.ShekelReceipt;
 import se.mit.spbau.ru.shekel3.model.ShekelUser;
 import se.mit.spbau.ru.shekel3.utils.ShekelFormBuilder;
 import se.mit.spbau.ru.shekel3.utils.ShekelNetwork;
 
-public class ShekelItemEditFragment extends Fragment {
-    private ShekelItem item;
+/**
+ * Created by John on 11/25/2015.
+ */
+public class ShekelReceiptEditFragment extends Fragment {
     private boolean isNew;
     private LinearLayout form;
     private MainActivity mainActivity;
     private Map<Integer, ShekelUser> users;
 
     private EditText nameEditText;
-    private EditText costEditText;
     private ListView consumersList;
 
     private ShekelReceipt receipt;
 
     public void setReceipt(ShekelReceipt shekelReceipt) {
         receipt = shekelReceipt;
-    }
-
-    public void setShekelItem(ShekelItem shekelItem) {
-        item = shekelItem;
     }
 
     public void setIsNew(Boolean value) {
@@ -89,30 +85,29 @@ public class ShekelItemEditFragment extends Fragment {
 
     private void buildForm() {
         nameEditText = new EditText(getActivity());
-        costEditText = new EditText(getActivity());
         if (isNew) {
-            ShekelFormBuilder.addFormField(form, getActivity(), nameEditText, "", "Name of Item", InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE);
-            ShekelFormBuilder.addFormField(form, getActivity(), costEditText, "", "Cost of Item", InputType.TYPE_CLASS_NUMBER);
+            ShekelFormBuilder.addFormField(form, getActivity(), nameEditText, "", "Name of Receipt", InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE);
         } else {
-            ShekelFormBuilder.addFormField(form, getActivity(), nameEditText, item.getName(), "Name of Item", InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE);
-            ShekelFormBuilder.addFormField(form, getActivity(), costEditText, String.valueOf(item.getCost()), "Cost of Item", InputType.TYPE_CLASS_NUMBER);
+            ShekelFormBuilder.addFormField(form, getActivity(), nameEditText, receipt.getName(), "Name of Receipt", InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE);
         }
 
-        List<ShekelBaseEntity> userList = new ArrayList<ShekelBaseEntity>(users.values());
-        Set<Integer> selectedId = new HashSet<>();
-        if (!isNew) {
-            for (ShekelUser shekelUser : item.getConsumers()) {
-                selectedId.add(shekelUser.getId());
+        if (isNew) {
+            List<ShekelBaseEntity> userList = new ArrayList<ShekelBaseEntity>(users.values());
+            Set<Integer> selectedId = new HashSet<>();
+            if (!isNew) {
+                for (ShekelUser shekelUser : receipt.getConsumers()) {
+                    selectedId.add(shekelUser.getId());
+                }
             }
+            consumersList = new ListView(getActivity());
+            ShekelFormBuilder.addCheckBoxListView(form, getContext(), consumersList, userList, selectedId);
         }
-        consumersList = new ListView(getActivity());
-        ShekelFormBuilder.addCheckBoxListView(form, getContext(), consumersList, userList, selectedId);
 
         ShekelFormBuilder.addButton(form, getActivity(), R.string.SaveButtonText, new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 saveChanges();
-                mainActivity.showItemList(receipt);
+                mainActivity.showReceiptList();
             }
         });
 
@@ -120,42 +115,36 @@ public class ShekelItemEditFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 cancelChanges();
-                mainActivity.showItemList(receipt);
+                mainActivity.showReceiptList();
             }
         });
     }
 
     private void saveChanges() {
         String name = nameEditText.getText().toString();
-        Integer cost = Integer.valueOf(costEditText.getText().toString());
-        Set<Integer> selected = ((CheckBoxListShekelNamedAdapter) consumersList.getAdapter()).getSelected();
-
         if (name.isEmpty()) {
             showErrorDialog("Name is empty");
             return;
         }
 
-        if (cost < 0) {
-            showErrorDialog("Cost must be > 0");
-            return;
+        if (isNew) {
+            Set<Integer> selected = ((CheckBoxListShekelNamedAdapter) consumersList.getAdapter()).getSelected();
+            if (selected.size() != 1) {
+                showErrorDialog("One consumer must be selected!");
+                return;
+            }
+            for (Integer userId : selected) { // hack in selected must be 1 user
+                receipt.setOwner(users.get(userId));
+            }
         }
 
-        if (selected.size() == 0) {
-            showErrorDialog("No consumer selected!");
-            return;
-        }
+        receipt.setName(name);
 
-        item.setName(name);
-        item.setCost(cost);
-        item.setConsumers(new ArrayList<ShekelUser>());
-        for (Integer userId : selected) {
-            item.getConsumers().add(users.get(userId));
-        }
         String url;
         if (isNew) {
-            url = ShekelNetwork.getInstance(getContext()).getUrlForAddItem(receipt.getId(), item);
+            url = ShekelNetwork.getInstance(getContext()).getUrlForAddReceipt(receipt);
         } else {
-            url = ShekelNetwork.getInstance(getContext()).getUrlForUpdateItem(receipt.getId(), item);
+            url = ShekelNetwork.getInstance(getContext()).getUrlForUpdateReceipt(receipt);
         }
 
         JsonObjectRequest request = new JsonObjectRequest(
@@ -165,13 +154,13 @@ public class ShekelItemEditFragment extends Fragment {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.d("Item Edit Fragment", "onResponse() called with: " + "response = [" + response + "]");
+                        Log.d("Receipt Edit Fragment", "onResponse() called with: " + "response = [" + response + "]");
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("Item Edit Fragment", "onErrorResponse() called with: " + "error = [" + error + "]");
+                        Log.d("Receipt Edit Fragment", "onErrorResponse() called with: " + "error = [" + error + "]");
                     }
                 }
         );
@@ -187,4 +176,5 @@ public class ShekelItemEditFragment extends Fragment {
     private void cancelChanges() {
         // nothing to do here
     }
+
 }

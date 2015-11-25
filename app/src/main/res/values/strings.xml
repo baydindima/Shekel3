@@ -8,4 +8,7 @@
     <string name="CancelButtonText">Cancel</string>
     <string name="SaveButtonText">Save</string>
     <string name="DeleteButtonText">Delete</string>
+    <string name="action_add">Add</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
 </resources>
