@@ -9,27 +9,25 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import se.mit.spbau.ru.shekel3.R;
-import se.mit.spbau.ru.shekel3.model.ShekelItem;
-import se.mit.spbau.ru.shekel3.model.ShekelNamed;
+import se.mit.spbau.ru.shekel3.model.ShekelBaseEntity;
 
 /**
  * Created by John on 11/13/2015.
  */
-public class ListShekelItemAdapter extends ArrayAdapter<ShekelNamed> {
+public class ListShekelNamedAdapter extends ArrayAdapter<ShekelBaseEntity> {
 
     private static class ViewHolder {
         TextView name;
     }
 
-    public ListShekelItemAdapter(Context context, List<ShekelNamed> items1) {
+    public ListShekelNamedAdapter(Context context, List<ShekelBaseEntity> items1) {
         super(context, android.R.layout.simple_list_item_1, items1);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the data item for this position
-        ShekelNamed item = getItem(position);
+        ShekelBaseEntity item = getItem(position);
         // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
         if (convertView == null) {

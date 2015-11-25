@@ -6,6 +6,9 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
+import se.mit.spbau.ru.shekel3.model.ShekelItem;
+import se.mit.spbau.ru.shekel3.model.ShekelUser;
+
 /**
  * Created by John on 11/13/2015.
  */
@@ -55,6 +58,19 @@ public class ShekelNetwork  {
 
     public String getReceiptUrl(Integer receiptId) {
         return SERVER_ADDRESS + "event_id/" + receiptId;
+    }
+
+    public String getUrlForUpdateItem(ShekelItem item) {
+        StringBuilder builder = new StringBuilder();
+        for (ShekelUser shekelUser : item.getConsumers()) {
+            builder.append(shekelUser.getId()).append(",");
+        }
+        String consumersList = builder.deleteCharAt(builder.length() - 1).toString();
+        return SERVER_ADDRESS + "event_id/1/" +item.getId() + "/edit?name="+ item.getName()+"&cost="+item.getCost()+"&consumer_ids=" + consumersList;
+    }
+
+    public String getUrlForAddItem(ShekelItem item) {
+        return "";
     }
 
     public String getAllUsersUrl() {

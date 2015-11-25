@@ -18,7 +18,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor(suppressConstructorProperties = true)
-public class ShekelItem implements ShekelNamed {
+public class ShekelItem implements ShekelBaseEntity {
     private String name;
     private Integer id;
     private Integer cost;
@@ -35,7 +35,7 @@ public class ShekelItem implements ShekelNamed {
         private String name;
         private Integer id;
         private Integer cost;
-        private List<Integer> consumerIds;
+        private List<Integer> consumer_ids;
         private Integer customer;
     }
 

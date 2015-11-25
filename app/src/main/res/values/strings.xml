@@ -5,4 +5,7 @@
     <string name="costString">Цена</string>
     <string name="nameString">Название</string>
     <string name="addItemString">Добавить вещь</string>
+    <string name="CancelButtonText">Cancel</string>
+    <string name="SaveButtonText">Save</string>
+    <string name="DeleteButtonText">Delete</string>
 </resources>

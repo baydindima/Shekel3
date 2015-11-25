@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @AllArgsConstructor(suppressConstructorProperties = true)
 @Getter
-public class ShekelUser implements ShekelNamed {
+public class ShekelUser implements ShekelBaseEntity {
     private String name;
     private Integer id;
 
@@ -19,7 +19,7 @@ public class ShekelUser implements ShekelNamed {
     @NoArgsConstructor
     @Getter
     @Setter
-    private static class UserContainer {
+    public static class UserContainer {
         private List<ShekelUser> data;
         private Integer result;
     }

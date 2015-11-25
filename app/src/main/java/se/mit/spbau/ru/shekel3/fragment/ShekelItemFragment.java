@@ -18,22 +18,25 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import se.mit.spbau.ru.shekel3.MainActivity;
-import se.mit.spbau.ru.shekel3.R;
-import se.mit.spbau.ru.shekel3.adapter.ListShekelItemAdapter;
+import se.mit.spbau.ru.shekel3.adapter.ListShekelNamedAdapter;
 import se.mit.spbau.ru.shekel3.model.ShekelItem;
-import se.mit.spbau.ru.shekel3.model.ShekelNamed;
+import se.mit.spbau.ru.shekel3.model.ShekelBaseEntity;
+import se.mit.spbau.ru.shekel3.model.ShekelUser;
 import se.mit.spbau.ru.shekel3.utils.ShekelNetwork;
 
 
 public class ShekelItemFragment extends ListFragment {
-    private List<ShekelNamed> itemList = new ArrayList<>();
+    private MainActivity mainActivity;
+    private List<ShekelBaseEntity> itemList = new ArrayList<>();
+    private Map<Integer, ShekelUser> users;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        mainActivity = (MainActivity) getActivity();
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.GET,
                 ShekelNetwork.getInstance(getContext()).getAllItemsUrl(1),
@@ -42,6 +45,7 @@ public class ShekelItemFragment extends ListFragment {
                     @Override
                     public void onResponse(JSONObject response) {
                         Gson gson = new Gson();
+                        users = mainActivity.getUsers(); //todo maybe error (race)
                         ShekelItem.ItemModelContainer container = gson.fromJson(response.toString(), ShekelItem.ItemModelContainer.class);
                         List<ShekelItem.ItemModel> data = container.getData();
                         for (ShekelItem.ItemModel itemModel : data) {
@@ -49,9 +53,13 @@ public class ShekelItemFragment extends ListFragment {
                             shekelItem.setCost(itemModel.getCost());
                             shekelItem.setId(itemModel.getId());
                             shekelItem.setName(itemModel.getName());
+                            for (Integer id : itemModel.getConsumer_ids()) {
+                                shekelItem.getConsumers().add(users.get(id));
+                            }
+                            shekelItem.setCustomer(users.get(itemModel.getCustomer()));
                             itemList.add(shekelItem);
                         }
-                        setListAdapter(new ListShekelItemAdapter(getActivity(), itemList));
+                        setListAdapter(new ListShekelNamedAdapter(getActivity(), itemList));
                     }
                 },
                 new Response.ErrorListener() {
@@ -68,6 +76,6 @@ public class ShekelItemFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        ((MainActivity) getActivity()).changeItem((ShekelItem) l.getAdapter().getItem(position));
+        mainActivity.changeItem((ShekelItem) l.getAdapter().getItem(position));
     }
 }

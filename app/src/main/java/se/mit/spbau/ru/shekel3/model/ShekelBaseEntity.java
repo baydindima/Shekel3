@@ -5,7 +5,7 @@ package se.mit.spbau.ru.shekel3.model;
  *
  * Created by John on 11/24/2015.
  */
-public interface ShekelNamed {
+public interface ShekelBaseEntity {
     public String getName();
-
+    public Integer getId();
 }
