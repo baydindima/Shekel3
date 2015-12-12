@@ -5,11 +5,17 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -27,9 +33,11 @@ import se.mit.spbau.ru.shekel3.MainActivity;
 import se.mit.spbau.ru.shekel3.R;
 import se.mit.spbau.ru.shekel3.adapter.ListShekelNamedAdapter;
 import se.mit.spbau.ru.shekel3.model.ShekelBaseEntity;
+import se.mit.spbau.ru.shekel3.model.ShekelEvent;
 import se.mit.spbau.ru.shekel3.model.ShekelItem;
 import se.mit.spbau.ru.shekel3.model.ShekelReceipt;
 import se.mit.spbau.ru.shekel3.model.ShekelUser;
+import se.mit.spbau.ru.shekel3.utils.ShekelFormBuilder;
 import se.mit.spbau.ru.shekel3.utils.ShekelNetwork;
 
 
@@ -43,19 +51,64 @@ public class ShekelItemFragment extends ListFragment {
         receipt = shekelReceipt;
     }
 
+    private ShekelEvent event;
+    public void setEvent(ShekelEvent event) {
+        this.event = event;
+    }
+
+    private void addHeader() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                TextView header = new TextView(getActivity());
+                header.setText(R.string.ItemListName);
+                header.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Log.d("Item Fragment", "OnClickListener() called with: ");
+                    }
+                });
+
+                Button button = new Button(getActivity());
+                button.setText(R.string.AddName);
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mainActivity.addNewItem(event, receipt);
+                    }
+                });
+
+                AbsListView.LayoutParams layoutParams = new ListView.LayoutParams(
+                        100, ListView.LayoutParams.WRAP_CONTENT);
+
+                button.setLayoutParams(layoutParams);
+
+                getListView().addHeaderView(header);
+                getListView().addHeaderView(button);
+            }
+        });
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+
+        super.onViewCreated(view, savedInstanceState);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mainActivity = (MainActivity) getActivity();
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.GET,
-                ShekelNetwork.getInstance(getContext()).getAllItemsUrl(receipt.getId()),
+                ShekelNetwork.getInstance(getContext()).getAllItemsUrl(event, receipt),
                 null, // no parameters post
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         Gson gson = new Gson();
-                        users = mainActivity.getUsers(); //todo maybe error (race)
+                        users = mainActivity.getUsers();
+                        addHeader();
                         ShekelItem.ItemModelContainer container = gson.fromJson(response.toString(), ShekelItem.ItemModelContainer.class);
                         List<ShekelItem.ItemModel> data = container.getData();
                         for (ShekelItem.ItemModel itemModel : data) {
@@ -101,34 +154,35 @@ public class ShekelItemFragment extends ListFragment {
     public boolean onContextItemSelected(MenuItem item) {
         if (getUserVisibleHint()) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-            ShekelItem shekelItem = (ShekelItem) getListAdapter().getItem(info.position);
+            ShekelItem shekelItem = (ShekelItem) getListAdapter().getItem((int) info.id);
             switch (item.getItemId()) {
                 case R.id.action_add:
-                    mainActivity.addNewItem(receipt);
+                    mainActivity.addNewItem(event, receipt);
                     return true;
                 case R.id.action_delete:
                     JsonObjectRequest request = new JsonObjectRequest(
                             Request.Method.GET,
-                            ShekelNetwork.getInstance(getContext()).getUrlForDeleteItem(receipt.getId(), shekelItem),
+                            ShekelNetwork.getInstance(getContext()).getUrlForDeleteItem(event, receipt, shekelItem),
                             null, // no parameters post
                             new Response.Listener<JSONObject>() {
                                 @Override
                                 public void onResponse(JSONObject response) {
+                                    mainActivity.showItemList(event, receipt);
                                     Log.d("Item Fragment", "onErrorResponse() called with: " + "error = [" + response + "]");
                                 }
                             },
                             new Response.ErrorListener() {
                                 @Override
                                 public void onErrorResponse(VolleyError error) {
+                                    mainActivity.showItemList(event, receipt);
                                     Log.d("Item Fragment", "onErrorResponse() called with: " + "error = [" + error + "]");
                                 }
                             }
                     );
                     ShekelNetwork.getInstance(getContext()).addToRequestQueue(request);
-                    mainActivity.showItemList(receipt);
                     return true;
                 case R.id.action_edit:
-                    mainActivity.changeItem(receipt, shekelItem);
+                    mainActivity.changeItem(event, receipt, shekelItem);
                     return true;
                 default:
                     return super.onContextItemSelected(item);
@@ -137,10 +191,10 @@ public class ShekelItemFragment extends ListFragment {
         return super.onContextItemSelected(item);
     }
 
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        mainActivity.changeItem(receipt, (ShekelItem) l.getAdapter().getItem(position));
-    }
+//    @Override
+//    public void onListItemClick(ListView l, View v, int position, long id) {
+//        super.onListItemClick(l, v, position, id);
+//        mainActivity.changeItem(event, receipt, (ShekelItem) l.getAdapter().getItem(position));
+//    }
 
 }

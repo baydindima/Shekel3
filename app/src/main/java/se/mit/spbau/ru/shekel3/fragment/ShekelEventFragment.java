@@ -1,5 +1,6 @@
 package se.mit.spbau.ru.shekel3.fragment;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
@@ -21,6 +22,8 @@ import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,73 +33,31 @@ import se.mit.spbau.ru.shekel3.R;
 import se.mit.spbau.ru.shekel3.adapter.ListShekelNamedAdapter;
 import se.mit.spbau.ru.shekel3.model.ShekelBaseEntity;
 import se.mit.spbau.ru.shekel3.model.ShekelEvent;
-import se.mit.spbau.ru.shekel3.model.ShekelReceipt;
 import se.mit.spbau.ru.shekel3.model.ShekelUser;
+import se.mit.spbau.ru.shekel3.utils.ShekelFormBuilder;
 import se.mit.spbau.ru.shekel3.utils.ShekelNetwork;
 
-public class ShekelReceiptFragment extends ListFragment {
+/**
+ * Created by John on 12/11/2015.
+ */
+public class ShekelEventFragment extends ListFragment {
     private MainActivity mainActivity;
-    private List<ShekelBaseEntity> receiptList = new ArrayList<>();
+    private List<ShekelBaseEntity> eventList = new ArrayList<>();
     private Map<Integer, ShekelUser> users;
 
-    private ShekelEvent event;
-
-    public void setEvent(ShekelEvent event) {
-        this.event = event;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mainActivity = (MainActivity) getActivity();
-
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.GET,
-                ShekelNetwork.getInstance(getContext()).getAllReceiptsUrl(event),
-                null, // no parameters post
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Gson gson = new Gson();
-                        users = mainActivity.getUsers(); //todo maybe error (race)
-                        ShekelReceipt.ShekelReceiptModelContainer container = gson.fromJson(response.toString(), ShekelReceipt.ShekelReceiptModelContainer.class);
-                        for (ShekelReceipt.ShekelReceiptModel shekelReceiptModel : container.getData()) {
-                            ShekelReceipt shekelReceipt = new ShekelReceipt();
-                            shekelReceipt.setId(shekelReceiptModel.getId());
-                            shekelReceipt.setName(shekelReceiptModel.getName());
-                            shekelReceipt.setCost(shekelReceiptModel.getCost());
-                            shekelReceipt.setOwner(users.get(shekelReceiptModel.getOwner()));
-                            List<ShekelUser> userList = new ArrayList<>();
-                            for (Integer userId : shekelReceiptModel.getConsumer_ids()) {
-                                userList.add(users.get(userId));
-                            }
-                            shekelReceipt.setConsumers(userList);
-                            receiptList.add(shekelReceipt);
-                        }
-                        setListAdapter(new ListShekelNamedAdapter(getActivity(), receiptList));
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d("Receipt Fragment", "onErrorResponse() called with: " + "error = [" + error + "]");
-                    }
-                }
-        );
-
-        ShekelNetwork.getInstance(getContext()).addToRequestQueue(request);
-    }
+    @SuppressLint("SimpleDateFormat")
+    private SimpleDateFormat dateFormat = new SimpleDateFormat(ShekelFormBuilder.DATE_FORMAT);
 
     private void addHeader() {
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 TextView header = new TextView(getActivity());
-                header.setText(R.string.ReceiptListName);
+                header.setText(R.string.EventListName);
                 header.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Log.d("Receipt Fragment", "OnClickListener() called with: ");
+                        Log.d("Event Fragment", "OnClickListener() called with: ");
                     }
                 });
 
@@ -105,7 +66,7 @@ public class ShekelReceiptFragment extends ListFragment {
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        mainActivity.addNewReceipt(event);
+                        mainActivity.addNewEvent();
                     }
                 });
 
@@ -121,9 +82,51 @@ public class ShekelReceiptFragment extends ListFragment {
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        addHeader();
-        super.onViewCreated(view, savedInstanceState);
+    public void onViewCreated(View view1, Bundle savedInstanceState) {
+        super.onViewCreated(view1, savedInstanceState);
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mainActivity = (MainActivity) getActivity();
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.GET,
+                ShekelNetwork.getInstance(getContext()).getAllEventsUrl(),
+                null, // no parameters post
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        addHeader();
+                        Gson gson = new Gson();
+                        users = mainActivity.getUsers();
+                        ShekelEvent.ShekelEventModelContainer container = gson.fromJson(response.toString(), ShekelEvent.ShekelEventModelContainer.class);
+                        for (ShekelEvent.ShekelEventModel model : container.getData()) {
+                            ShekelEvent shekelEvent = new ShekelEvent();
+                            shekelEvent.setName(model.getName());
+                            shekelEvent.setId(model.getId());
+                            for (Integer userId : model.getMembers_ids()) {
+                                shekelEvent.getUsers().add(users.get(userId));
+                            }
+                            try {
+                                shekelEvent.setDate(dateFormat.parse(model.getDate()));
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            eventList.add(shekelEvent);
+                        }
+                        setListAdapter(new ListShekelNamedAdapter(getActivity(), eventList));
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("Event Fragment", "onErrorResponse() called with: " + "error = [" + error + "]");
+                    }
+                }
+        );
+        ShekelNetwork.getInstance(getContext()).addToRequestQueue(request);
     }
 
     @Override
@@ -144,35 +147,35 @@ public class ShekelReceiptFragment extends ListFragment {
     public boolean onContextItemSelected(MenuItem item) {
         if (getUserVisibleHint()) {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-            ShekelReceipt receipt = (ShekelReceipt) getListAdapter().getItem((int) info.id);
+            ShekelEvent event = (ShekelEvent) getListAdapter().getItem((int) info.id);
             switch (item.getItemId()) {
                 case R.id.action_add:
-                    mainActivity.addNewReceipt(event);
+                    mainActivity.addNewEvent();
                     return true;
                 case R.id.action_delete:
                     JsonObjectRequest request = new JsonObjectRequest(
                             Request.Method.GET,
-                            ShekelNetwork.getInstance(getContext()).getUrlForDeleteReceipt(event, receipt),
+                            ShekelNetwork.getInstance(getContext()).getUrlForDeleteEvent(event),
                             null, // no parameters post
                             new Response.Listener<JSONObject>() {
                                 @Override
                                 public void onResponse(JSONObject response) {
-                                    mainActivity.showReceiptList(event);
-                                    Log.d("Receipt Fragment", "onErrorResponse() called with: " + "error = [" + response + "]");
+                                    mainActivity.showEventList();
+                                    Log.d("Event Fragment", "onResponse() called with: " + "response = [" + response + "]");
                                 }
                             },
                             new Response.ErrorListener() {
                                 @Override
                                 public void onErrorResponse(VolleyError error) {
-                                    mainActivity.showReceiptList(event);
-                                    Log.d("Receipt Fragment", "onErrorResponse() called with: " + "error = [" + error + "]");
+                                    mainActivity.showEventList();
+                                    Log.d("Event Fragment", "onErrorResponse() called with: " + "error = [" + error + "]");
                                 }
                             }
                     );
                     ShekelNetwork.getInstance(getContext()).addToRequestQueue(request);
                     return true;
                 case R.id.action_edit:
-                    mainActivity.changeReceipt(event, receipt);
+                    mainActivity.changeEvent(event);
                     return true;
                 default:
                     return super.onContextItemSelected(item);
@@ -184,7 +187,7 @@ public class ShekelReceiptFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        mainActivity.showItemList(event, (ShekelReceipt) l.getAdapter().getItem(position));
+        mainActivity.showReceiptList((ShekelEvent) l.getAdapter().getItem(position));
     }
 
 }

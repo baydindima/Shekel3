@@ -22,6 +22,8 @@ import se.mit.spbau.ru.shekel3.model.ShekelBaseEntity;
  */
 public class ShekelFormBuilder {
 
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
+
     public static LinearLayout.LayoutParams getDefaultParams(boolean isLabel) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);

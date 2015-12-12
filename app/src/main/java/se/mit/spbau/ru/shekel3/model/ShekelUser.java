@@ -23,4 +23,14 @@ public class ShekelUser implements ShekelBaseEntity {
         private List<ShekelUser> data;
         private Integer result;
     }
+
+    @NoArgsConstructor
+    @Getter
+    @Setter
+    public static class UserAuthResult {
+        private String user_name;
+        private Integer result;
+        private Integer user_id;
+        private String access_token;
+    }
 }

@@ -11,4 +11,8 @@
     <string name="action_add">Add</string>
     <string name="action_delete">Delete</string>
     <string name="action_edit">Edit</string>
+    <string name="EventListName">Events list</string>
+    <string name="ItemListName">Item list</string>
+    <string name="AddName">Add</string>
+    <string name="ReceiptListName">Receipt list</string>
 </resources>

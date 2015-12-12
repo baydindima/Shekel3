@@ -30,6 +30,7 @@ import se.mit.spbau.ru.shekel3.MainActivity;
 import se.mit.spbau.ru.shekel3.R;
 import se.mit.spbau.ru.shekel3.adapter.CheckBoxListShekelNamedAdapter;
 import se.mit.spbau.ru.shekel3.model.ShekelBaseEntity;
+import se.mit.spbau.ru.shekel3.model.ShekelEvent;
 import se.mit.spbau.ru.shekel3.model.ShekelReceipt;
 import se.mit.spbau.ru.shekel3.model.ShekelUser;
 import se.mit.spbau.ru.shekel3.utils.ShekelFormBuilder;
@@ -48,9 +49,13 @@ public class ShekelReceiptEditFragment extends Fragment {
     private ListView consumersList;
 
     private ShekelReceipt receipt;
-
     public void setReceipt(ShekelReceipt shekelReceipt) {
         receipt = shekelReceipt;
+    }
+
+    private ShekelEvent event;
+    public void setEvent(ShekelEvent event) {
+        this.event = event;
     }
 
     public void setIsNew(Boolean value) {
@@ -60,27 +65,27 @@ public class ShekelReceiptEditFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        ScrollView view = new ScrollView(getActivity());
-        mainActivity = (MainActivity) getActivity();
-        users = mainActivity.getUsers(); //todo maybe error (race)
+            ScrollView view = new ScrollView(getActivity());
+            mainActivity = (MainActivity) getActivity();
+            users = mainActivity.getUsers();
 
-        view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+            view.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
 
 
-        form = new LinearLayout(getActivity());
-        form.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT));
-        form.setOrientation(LinearLayout.VERTICAL);
+            form = new LinearLayout(getActivity());
+            form.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
+            form.setOrientation(LinearLayout.VERTICAL);
 
-        view.addView(form);
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                buildForm();
-            }
-        });
-        return view;
+            view.addView(form);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    buildForm();
+                }
+            });
+            return view;
     }
 
     private void buildForm() {
@@ -94,11 +99,6 @@ public class ShekelReceiptEditFragment extends Fragment {
         if (isNew) {
             List<ShekelBaseEntity> userList = new ArrayList<ShekelBaseEntity>(users.values());
             Set<Integer> selectedId = new HashSet<>();
-            if (!isNew) {
-                for (ShekelUser shekelUser : receipt.getConsumers()) {
-                    selectedId.add(shekelUser.getId());
-                }
-            }
             consumersList = new ListView(getActivity());
             ShekelFormBuilder.addCheckBoxListView(form, getContext(), consumersList, userList, selectedId);
         }
@@ -107,7 +107,6 @@ public class ShekelReceiptEditFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 saveChanges();
-                mainActivity.showReceiptList();
             }
         });
 
@@ -115,7 +114,7 @@ public class ShekelReceiptEditFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 cancelChanges();
-                mainActivity.showReceiptList();
+                mainActivity.showReceiptList(event);
             }
         });
     }
@@ -142,9 +141,9 @@ public class ShekelReceiptEditFragment extends Fragment {
 
         String url;
         if (isNew) {
-            url = ShekelNetwork.getInstance(getContext()).getUrlForAddReceipt(receipt);
+            url = ShekelNetwork.getInstance(getContext()).getUrlForAddReceipt(event, receipt);
         } else {
-            url = ShekelNetwork.getInstance(getContext()).getUrlForUpdateReceipt(receipt);
+            url = ShekelNetwork.getInstance(getContext()).getUrlForUpdateReceipt(event, receipt);
         }
 
         JsonObjectRequest request = new JsonObjectRequest(
@@ -154,12 +153,14 @@ public class ShekelReceiptEditFragment extends Fragment {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+                        mainActivity.showReceiptList(event);
                         Log.d("Receipt Edit Fragment", "onResponse() called with: " + "response = [" + response + "]");
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        mainActivity.showReceiptList(event);
                         Log.d("Receipt Edit Fragment", "onErrorResponse() called with: " + "error = [" + error + "]");
                     }
                 }
