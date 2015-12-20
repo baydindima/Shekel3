@@ -110,13 +110,13 @@ public class ShekelReceiptEditFragment extends Fragment {
             }
         });
 
-        ShekelFormBuilder.addButton(form, getActivity(), R.string.CancelButtonText, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cancelChanges();
-                mainActivity.showReceiptList(event);
-            }
-        });
+//        ShekelFormBuilder.addButton(form, getActivity(), R.string.CancelButtonText, new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                cancelChanges();
+//                mainActivity.showReceiptList(event);
+//            }
+//        });
     }
 
     private void saveChanges() {

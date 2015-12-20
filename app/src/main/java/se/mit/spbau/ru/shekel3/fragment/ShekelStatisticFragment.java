@@ -36,9 +36,6 @@ import se.mit.spbau.ru.shekel3.model.statistics.ShekelConsumedStatistic;
 import se.mit.spbau.ru.shekel3.model.statistics.ShekelSpentStatistic;
 import se.mit.spbau.ru.shekel3.utils.ShekelNetwork;
 
-/**
- * Created by John on 12/12/2015.
- */
 public class ShekelStatisticFragment extends Fragment {
     private LinearLayout form;
     private MainActivity mainActivity;
@@ -84,8 +81,8 @@ public class ShekelStatisticFragment extends Fragment {
                         Gson gson = new Gson();
                         ShekelEvent.ShekelEventModelContainer container = gson.fromJson(response.toString(), ShekelEvent.ShekelEventModelContainer.class);
                         for (ShekelEvent.ShekelEventModel model : container.getData()) {
-                            addConsunedPieChart(model.getId(), model.getName());
-                            addSpentPieChart(model.getId(), model.getName());
+                                addConsunedPieChart(model.getId(), model.getName());
+                                addSpentPieChart(model.getId(), model.getName());
                         }
                     }
                 },

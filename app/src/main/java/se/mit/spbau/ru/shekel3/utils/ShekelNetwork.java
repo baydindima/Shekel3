@@ -56,6 +56,10 @@ public class ShekelNetwork {
         return SERVER_ADDRESS + String.format("%d/consumed?", eventId) + shekelAccountManager.getAuthParam();
     }
 
+    public String getEventDebtsUrl(Integer eventId) {
+        return SERVER_ADDRESS + String.format("%d/debts?", eventId) + shekelAccountManager.getAuthParam();
+    }
+
     public String getAllEventsUrl() {
         return SERVER_ADDRESS + "events?" + shekelAccountManager.getAuthParam();
     }

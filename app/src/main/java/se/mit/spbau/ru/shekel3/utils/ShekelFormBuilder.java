@@ -37,6 +37,9 @@ public class ShekelFormBuilder {
     public static void addCheckBoxListView(LinearLayout form, Context context, ListView listView, List<ShekelBaseEntity> elements, Set<Integer> selectedId) {
         CheckBoxListShekelNamedAdapter adapter = new CheckBoxListShekelNamedAdapter(context, elements, selectedId);
         listView.setAdapter(adapter);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                300, 1.0f);
+        listView.setLayoutParams(params);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {

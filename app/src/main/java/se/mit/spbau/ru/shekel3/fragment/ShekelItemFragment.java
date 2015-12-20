@@ -108,7 +108,7 @@ public class ShekelItemFragment extends ListFragment {
                     public void onResponse(JSONObject response) {
                         Gson gson = new Gson();
                         users = mainActivity.getUsers();
-                        addHeader();
+//                        addHeader();
                         ShekelItem.ItemModelContainer container = gson.fromJson(response.toString(), ShekelItem.ItemModelContainer.class);
                         List<ShekelItem.ItemModel> data = container.getData();
                         for (ShekelItem.ItemModel itemModel : data) {

@@ -57,6 +57,7 @@ public class ShekelReceiptFragment extends ListFragment {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
+//                        addHeader();
                         Gson gson = new Gson();
                         users = mainActivity.getUsers(); //todo maybe error (race)
                         ShekelReceipt.ShekelReceiptModelContainer container = gson.fromJson(response.toString(), ShekelReceipt.ShekelReceiptModelContainer.class);
@@ -122,7 +123,6 @@ public class ShekelReceiptFragment extends ListFragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        addHeader();
         super.onViewCreated(view, savedInstanceState);
     }
 

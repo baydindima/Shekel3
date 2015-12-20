@@ -26,7 +26,7 @@ public class ShekelEvent implements ShekelBaseEntity {
         private String name;
         private Integer id;
         private String date;
-        List<Integer> members_ids;
+        List<Integer> member_ids;
     }
 
     @NoArgsConstructor

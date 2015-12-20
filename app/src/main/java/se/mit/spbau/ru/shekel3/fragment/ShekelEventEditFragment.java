@@ -113,13 +113,13 @@ public class ShekelEventEditFragment extends Fragment {
             }
         });
 
-        ShekelFormBuilder.addButton(form, getActivity(), R.string.CancelButtonText, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cancelChanges();
-                mainActivity.showEventList();
-            }
-        });
+//        ShekelFormBuilder.addButton(form, getActivity(), R.string.CancelButtonText, new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                cancelChanges();
+//                mainActivity.showEventList();
+//            }
+//        });
     }
 
     private void saveChanges() {

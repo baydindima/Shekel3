@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import se.mit.spbau.ru.shekel3.fragment.ShekelAccountFragment;
+import se.mit.spbau.ru.shekel3.fragment.ShekelDebtsStatisticsFragment;
 import se.mit.spbau.ru.shekel3.fragment.ShekelEventEditFragment;
 import se.mit.spbau.ru.shekel3.fragment.ShekelEventFragment;
 import se.mit.spbau.ru.shekel3.fragment.ShekelItemEditFragment;
@@ -33,6 +34,7 @@ import se.mit.spbau.ru.shekel3.model.ShekelEvent;
 import se.mit.spbau.ru.shekel3.model.ShekelItem;
 import se.mit.spbau.ru.shekel3.model.ShekelReceipt;
 import se.mit.spbau.ru.shekel3.model.ShekelUser;
+import se.mit.spbau.ru.shekel3.model.statistics.ShekelDebtsStatistics;
 import se.mit.spbau.ru.shekel3.utils.ShekelAccountManager;
 import se.mit.spbau.ru.shekel3.utils.ShekelNetwork;
 
@@ -100,10 +102,11 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager().popBackStack();
             switch (backStackEntry.getName()){
                 case "ItemList" :
-                    getSupportFragmentManager().popBackStack();
+//                    getSupportFragmentManager().popBackStack();
                 case "ReceiptList" :
+                    break;
                 case "Statistics" :
-                    showEventList();
+//                    showEventList();
                     break;
                 case "EventList" :
                 default:
@@ -132,11 +135,23 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
+        if (id == R.id.action_debts) {
+            showDebtsStatistics();
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
     public void showStatistics() {
         ShekelStatisticFragment statisticFragment = new ShekelStatisticFragment();
+        statisticFragment.setArguments(getIntent().getExtras());
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment, statisticFragment).addToBackStack("Statistics").commit();
+    }
+
+    public void showDebtsStatistics() {
+        ShekelDebtsStatisticsFragment statisticFragment = new ShekelDebtsStatisticsFragment();
         statisticFragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment, statisticFragment).addToBackStack("Statistics").commit();
@@ -220,6 +235,7 @@ public class MainActivity extends AppCompatActivity {
         ShekelEventFragment eventFragment = new ShekelEventFragment();
         eventFragment.setArguments(getIntent().getExtras());
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment, eventFragment).commit();
+                .replace(R.id.fragment, eventFragment).addToBackStack("ItemList").commit();
     }
 }
+//Vasya&password=gbdfcbr

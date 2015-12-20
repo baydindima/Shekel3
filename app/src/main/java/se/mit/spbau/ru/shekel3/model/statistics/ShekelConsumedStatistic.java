@@ -12,7 +12,7 @@ import se.mit.spbau.ru.shekel3.model.ShekelUser;
  */
 public class ShekelConsumedStatistic {
     ShekelUser user;
-    Integer consumed;
+    Float consumed;
     Integer itemsCount;
 
     @NoArgsConstructor
@@ -20,7 +20,7 @@ public class ShekelConsumedStatistic {
     @Setter
     public static class Model {
         Integer user;
-        Integer consumed;
+        Float consumed;
         Integer items_consumed;
     }
 

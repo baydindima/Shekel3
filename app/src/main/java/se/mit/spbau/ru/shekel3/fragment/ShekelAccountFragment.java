@@ -1,11 +1,12 @@
 package se.mit.spbau.ru.shekel3.fragment;
 
 import android.app.AlertDialog;
-import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -30,9 +30,7 @@ import se.mit.spbau.ru.shekel3.utils.ShekelAccountManager;
 import se.mit.spbau.ru.shekel3.utils.ShekelFormBuilder;
 import se.mit.spbau.ru.shekel3.utils.ShekelNetwork;
 
-/**
- * Created by John on 12/12/2015.
- */
+
 public class ShekelAccountFragment extends Fragment {
     private LinearLayout form;
     private MainActivity mainActivity;
@@ -77,6 +75,7 @@ public class ShekelAccountFragment extends Fragment {
         ShekelFormBuilder.addFormField(form, getActivity(), loginText, "", "Login", InputType.TYPE_TEXT_FLAG_AUTO_COMPLETE);
         passText = new EditText(getActivity());
         ShekelFormBuilder.addFormField(form, getActivity(), passText, "", "Password", InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        passText.setTransformationMethod(new PasswordTransformationMethod());
 
         ShekelFormBuilder.addButton(form, getActivity(), R.string.SaveButtonText, new View.OnClickListener() {
             @Override

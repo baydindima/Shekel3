@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,13 +21,12 @@ import se.mit.spbau.ru.shekel3.model.ShekelBaseEntity;
 public class CheckBoxListShekelNamedAdapter extends ArrayAdapter<ShekelBaseEntity> {
 
     private Set<Integer> selected = new HashSet<>();
+    private List<ShekelBaseEntity> items2;
 
-    public CheckBoxListShekelNamedAdapter(Context context, List<ShekelBaseEntity> items1) {
-        super(context, R.layout.check_list, items1);
-    }
 
     public CheckBoxListShekelNamedAdapter(Context context, List<ShekelBaseEntity> items1, Set<Integer> selectedItems) {
         super(context, R.layout.check_list, items1);
+        items2 = new ArrayList<>(items1);
         selected = selectedItems;
     }
 
@@ -41,14 +41,19 @@ public class CheckBoxListShekelNamedAdapter extends ArrayAdapter<ShekelBaseEntit
         // Check if an existing view is being reused, otherwise inflate the view
         ViewHolder viewHolder; // view lookup cache stored in tag
         if (convertView == null) {
-            viewHolder = new ViewHolder();
+
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(R.layout.check_list, parent, false);
+
+            viewHolder = new ViewHolder();
             viewHolder.name = (CheckBox) convertView.findViewById(R.id.checkBox1);
+
             if (selected.contains(item.getId())) {
                 viewHolder.name.setChecked(true);
             }
+
             convertView.setTag(viewHolder);
+
             viewHolder.name.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

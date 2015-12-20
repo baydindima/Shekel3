@@ -37,9 +37,7 @@ import se.mit.spbau.ru.shekel3.model.ShekelUser;
 import se.mit.spbau.ru.shekel3.utils.ShekelFormBuilder;
 import se.mit.spbau.ru.shekel3.utils.ShekelNetwork;
 
-/**
- * Created by John on 12/11/2015.
- */
+
 public class ShekelEventFragment extends ListFragment {
     private MainActivity mainActivity;
     private List<ShekelBaseEntity> eventList = new ArrayList<>();
@@ -97,7 +95,7 @@ public class ShekelEventFragment extends ListFragment {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        addHeader();
+//                        addHeader();
                         Gson gson = new Gson();
                         users = mainActivity.getUsers();
                         ShekelEvent.ShekelEventModelContainer container = gson.fromJson(response.toString(), ShekelEvent.ShekelEventModelContainer.class);
@@ -105,7 +103,7 @@ public class ShekelEventFragment extends ListFragment {
                             ShekelEvent shekelEvent = new ShekelEvent();
                             shekelEvent.setName(model.getName());
                             shekelEvent.setId(model.getId());
-                            for (Integer userId : model.getMembers_ids()) {
+                            for (Integer userId : model.getMember_ids()) {
                                 shekelEvent.getUsers().add(users.get(userId));
                             }
                             try {
